@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <RestartItems>
+    <RestartItem>
+      <Location>C:\Program Files (x86)\Steam\steam.exe</Location>
+      <AppName>Steam</AppName>
+      <Times>
+        <dateTime>2022-01-13T22:09:00+08:00</dateTime>
+      </Times>
+      <Times>
+        <dateTime>2022-01-13T22:10:00+08:00</dateTime>
+      </Times>
+    </RestartItem>
+    <RestartItem>
+      <Location>xxx</Location>
+      <AppName>xxx</AppName>
+      <Times>
+        <dateTime>2022-01-13T22:03:17.7036746+08:00</dateTime>
+      </Times>
+    </RestartItem>
+  </RestartItems>
+</Settings>
