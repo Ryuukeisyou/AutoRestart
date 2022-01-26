@@ -13,11 +13,27 @@ namespace AutoRestart
         static void Main(string[] args)
         {
             //CreateSettingsFile();
+            //return;
+
             var settings = Settings.Load("settings.xml");
-            Console.WriteLine("Settings loaded. Waiting for action.");
+            Console.WriteLine("Settings loaded.");
+            Console.WriteLine("---------------------------------");
+            foreach (var item in settings.RestartItems)
+            {
+                Console.WriteLine("Will close {0} and start {1} at:", item.AppName, item.Location);
+                foreach (var time in item.Times)
+                {
+                    Console.WriteLine(time.ToString());
+                }
+                Console.WriteLine("Bring to front: {0}", item.BringToFront);
+            }
+            Console.WriteLine("---------------------------------");
+            Console.WriteLine("Waiting for action...");
+            Console.WriteLine("---------------------------------");
 
             while (true)
             {
+                var timeMet = false;
                 foreach (var item in settings.RestartItems)
                 {
                     foreach (var time in item.Times)
@@ -26,16 +42,26 @@ namespace AutoRestart
                             DateTime.Now.Minute == time.Minute &&
                             DateTime.Now.Second == time.Second)
                         {
+                            timeMet = true;
+
                             Console.WriteLine(DateTime.Now);
                             Console.WriteLine("Starting to restart {0} at {1}", item.AppName, item.Location);
-                            ResetProgram(item.AppName, item.Location);
+
+                            Thread thread = new Thread(() => ResetProgram(item.AppName, item.Location, item.BringToFront));
+                            thread.Start();
                         }
                     }
-
                 }
-                Thread.Sleep(1000);
-            }
 
+                if (timeMet)
+                {
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    Thread.Sleep(500);
+                }
+            }
         }
 
         private static void CreateSettingsFile()
@@ -45,12 +71,14 @@ namespace AutoRestart
                 Location = "xxx",
                 AppName = "xxx",
                 Times = new List<DateTime> { DateTime.Now },
+                BringToFront = false,
             };
             RestartItem item1 = new RestartItem()
             {
                 Location = "xxx",
                 AppName = "xxx",
                 Times = new List<DateTime> { DateTime.Now },
+                BringToFront = true,
             };
 
             Settings restartItems = new Settings();
@@ -60,13 +88,22 @@ namespace AutoRestart
             restartItems.Save("Settings.xml");
         }
 
-        private static void ResetProgram(string appName, string location)
+        private static void ResetProgram(string appName, string location, bool bringToFront)
         {
             Process[] ps = Process.GetProcessesByName(appName);
             if(ps.Length > 0)
             {
                 Console.WriteLine("Trying to kill existing process of {0}...", appName);
-                ps.First().Kill();
+                while (ps.Length > 0)
+                {
+                    try
+                    {
+                        ps.First().Kill();
+                    }
+                    catch { }
+                    Thread.Sleep(1000);
+                    ps = Process.GetProcessesByName(appName);
+                }
                 Console.WriteLine("Process killed.");
             }
             else
@@ -81,6 +118,20 @@ namespace AutoRestart
             {
                 p.Start();
                 Console.WriteLine("Successfully started process at {0}.", location);
+                if (bringToFront)
+                {
+                    try
+                    {
+                        Console.WriteLine("Bringing {0} to front...", appName);
+                        var hnd = Pinvoke.FindWindow(null, appName);
+                        var broughtToFront = Pinvoke.SetForegroundWindow(hnd);
+                        Console.WriteLine("Successfully brought to front: {0}", broughtToFront);
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Failed to bing to front.");
+                    }
+                }
             }
             catch
             {
