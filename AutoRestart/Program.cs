@@ -44,10 +44,9 @@ namespace AutoRestart
                         {
                             timeMet = true;
 
-                            Console.WriteLine(DateTime.Now);
-                            Console.WriteLine("Starting to restart {0} at {1}", item.AppName, item.Location);
-
+                            Console.WriteLine("");
                             Thread thread = new Thread(() => ResetProgram(item.AppName, item.Location, item.BringToFront));
+                            Console.WriteLine("");
                             thread.Start();
                         }
                     }
@@ -90,6 +89,9 @@ namespace AutoRestart
 
         private static void ResetProgram(string appName, string location, bool bringToFront)
         {
+            Console.WriteLine(DateTime.Now);
+            Console.WriteLine("Starting to restart {0} at {1}", appName, location);
+
             Process[] ps = Process.GetProcessesByName(appName);
             if(ps.Length > 0)
             {
