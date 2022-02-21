@@ -129,9 +129,10 @@ namespace AutoRestart
                         var broughtToFront = Pinvoke.SetForegroundWindow(hnd);
                         Console.WriteLine("Successfully brought to front: {0}", broughtToFront);
                     }
-                    catch
+                    catch(Exception ex)
                     {
                         Console.WriteLine("Failed to bing to front.");
+                        Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
                     }
                 }
             }
