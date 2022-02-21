@@ -44,9 +44,8 @@ namespace AutoRestart
                         {
                             timeMet = true;
 
-                            Console.WriteLine("");
+                            Console.WriteLine("\n");
                             Thread thread = new Thread(() => ResetProgram(item.AppName, item.Location, item.BringToFront));
-                            Console.WriteLine("");
                             thread.Start();
                         }
                     }
