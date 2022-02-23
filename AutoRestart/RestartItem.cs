@@ -14,5 +14,6 @@ namespace AutoRestart
         public string AppName { get; set; }
         public List<DateTime> Times { get; set; }
         public bool BringToFront { get; set; }
+        public string WindowName { get; set; }
     }
 }
