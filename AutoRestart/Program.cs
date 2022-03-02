@@ -27,6 +27,12 @@ namespace AutoRestart
                     Console.WriteLine(time.ToString());
                 }
                 Console.WriteLine("Bring to front: {0}", item.BringToFront);
+                if (item.BringToFront)
+                {
+                    Console.WriteLine("Will keep {0} at front.", item.AppName);
+                    Thread thread = new Thread(() => KeepForeground(item.AppName));
+                    thread.Start();
+                }
             }
             Console.WriteLine("---------------------------------");
             Console.WriteLine("Waiting for action...");
@@ -139,6 +145,28 @@ namespace AutoRestart
             catch
             {
                 Console.WriteLine("Failed to start process at {0}", location);
+            }
+        }
+
+        private static void KeepForeground(string processName)
+        {
+            while (true)
+            {
+                try
+                {
+                    Process[] ps = Process.GetProcessesByName(processName);
+                    if(ps.Length > 0)
+                    {
+                        Process p = ps.First();
+                        Pinvoke.SetForegroundWindow(p.MainWindowHandle);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
+                }
+                Thread.Sleep(TimeSpan.FromMinutes(5));
+                //Thread.Sleep(TimeSpan.FromSeconds(5));
             }
         }
     }
