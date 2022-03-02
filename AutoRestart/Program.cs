@@ -12,6 +12,7 @@ namespace AutoRestart
     {
         static void Main(string[] args)
         {
+            Process[] processes = Process.GetProcessesByName("Arena");
             //CreateSettingsFile();
             //return;
 
@@ -45,7 +46,7 @@ namespace AutoRestart
                             timeMet = true;
 
                             Console.WriteLine("\n");
-                            Thread thread = new Thread(() => ResetProgram(item.AppName, item.Location, item.BringToFront, item.WindowName));
+                            Thread thread = new Thread(() => ResetProgram(item.AppName, item.Location, item.BringToFront));
                             thread.Start();
                         }
                     }
@@ -70,7 +71,6 @@ namespace AutoRestart
                 AppName = "xxx",
                 Times = new List<DateTime> { DateTime.Now },
                 BringToFront = false,
-                WindowName = "",
             };
             RestartItem item1 = new RestartItem()
             {
@@ -78,7 +78,6 @@ namespace AutoRestart
                 AppName = "xxx",
                 Times = new List<DateTime> { DateTime.Now },
                 BringToFront = true,
-                WindowName = "",
             };
 
             Settings restartItems = new Settings();
@@ -88,7 +87,7 @@ namespace AutoRestart
             restartItems.Save("Settings.xml");
         }
 
-        private static void ResetProgram(string appName, string location, bool bringToFront, string windowName)
+        private static void ResetProgram(string appName, string location, bool bringToFront)
         {
             Console.WriteLine(DateTime.Now);
             Console.WriteLine("Starting to restart {0} at {1}", appName, location);
@@ -123,12 +122,11 @@ namespace AutoRestart
                 Console.WriteLine("Successfully started process at {0}.", location);
                 if (bringToFront)
                 {
-                    Thread.Sleep(5000);
+                    Thread.Sleep(10000);
                     try
                     {
-                        Console.WriteLine("Bringing {0} to front...", windowName);
-                        var hnd = Pinvoke.FindWindow(null, windowName);
-                        var broughtToFront = Pinvoke.SetForegroundWindow(hnd);
+                        Console.WriteLine("Bringing {0} to front...", p.ProcessName);
+                        var broughtToFront = Pinvoke.SetForegroundWindow(p.MainWindowHandle);
                         Console.WriteLine("Successfully brought to front: {0}", broughtToFront);
                     }
                     catch(Exception ex)
